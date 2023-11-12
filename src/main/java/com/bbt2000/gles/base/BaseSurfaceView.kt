@@ -47,11 +47,6 @@ class BaseSurfaceView(
         }
     }
 
-    // native图像帧数据回调
-    interface IFrameCallback {
-        fun callback(byteBuffer: ByteBuffer, width: Int, height: Int)
-    }
-
     companion object {
         val TAG = BaseSurfaceView::class.simpleName
     }
