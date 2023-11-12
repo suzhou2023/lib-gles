@@ -7,7 +7,6 @@ import android.util.AttributeSet
 import android.view.SurfaceHolder
 import com.bbt2000.gles.jni.JniGL
 import com.bbt2000.gles.widget.AutoFitSurfaceView
-import java.nio.ByteBuffer
 
 
 /**
@@ -15,7 +14,7 @@ import java.nio.ByteBuffer
  *  date : 2023/11/12
  *  description :
  */
-class BaseSurfaceView(
+open class BaseSurfaceView(
     context: Context,
     attrs: AttributeSet? = null
 ) : AutoFitSurfaceView(context, attrs), SurfaceHolder.Callback {

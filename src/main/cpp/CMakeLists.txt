@@ -8,8 +8,10 @@ project(${PROJECT_NAME} VERSION 1.0)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+
 # 头文件
-include_directories("include")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
+
 
 # opengl相关api编译成so
 add_library(
@@ -17,8 +19,13 @@ add_library(
 
         SHARED
 
-        common/GLContext.cpp
         jni/jni.cpp
+        common/GLContext.cpp
+        common/asset_util.cpp
+        common/egl_util.cpp
+        common/fbo_util.cpp
+        common/gl_util.c
+        common/shader_util.cpp
 )
 
 # 链接库

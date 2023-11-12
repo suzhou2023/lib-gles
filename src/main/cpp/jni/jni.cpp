@@ -9,10 +9,10 @@
 #include <GLES2/gl2ext.h>
 #include <android/native_window_jni.h>
 #include <cstring>
-#include "AssetUtil.h"
-#include "GLContext.h"
+#include "../common/asset_util.cpp"
+#include "../common/GLContext.h"
 #include "EglUtil.h"
-#include "GlUtil.h"
+#include "../common/gl_util.c"
 
 
 extern "C"
