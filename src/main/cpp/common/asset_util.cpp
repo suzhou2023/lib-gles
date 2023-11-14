@@ -12,13 +12,13 @@
 GLubyte *asset_readFile(AAssetManager *assetManager, const char *filename) {
     AAsset *aAsset = AAssetManager_open(assetManager, filename, AASSET_MODE_BUFFER);
     off_t len = AAsset_getLength(aAsset);
-    LOGD("readFile, len = %ld", len);
+    LOGD("asset_readFile, len = %ld", len);
 
     auto *buf = new GLubyte[len + 1];
     buf[len] = '\0';
 
     off_t count = AAsset_read(aAsset, buf, len);
-    LOGD("readFile, count = %ld", count);
+    LOGD("asset_readFile, count = %ld", count);
 
     return buf;
 }

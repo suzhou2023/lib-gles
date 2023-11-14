@@ -12,7 +12,7 @@ GLuint shader_loadShader(const char *source, GLuint type) {
     // 创建shader
     GLuint shader = glCreateShader(type);
     if (shader == 0) {
-        LOGE("Create shader failed, type = %d", type);
+        LOGE("glCreateShader failed, type = %d", type);
         return -1;
     }
     // 加载shader
@@ -42,7 +42,7 @@ GLuint shader_createProgram(const char *source_vShader, const char *source_fShad
     // 创建渲染程序
     GLuint program = glCreateProgram();
     if (program <= 0) {
-        LOGE("GL create program failed.");
+        LOGE("glCreateProgram failed.");
         return -1;
     }
     // 向渲染程序中加入着色器

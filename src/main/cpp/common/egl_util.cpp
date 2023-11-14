@@ -58,13 +58,13 @@ EGLBoolean egl_createContext(GLContext *glContext, EGLContext shareContext) {
             ctxAttr
     );
     if (glContext->eglContext == EGL_NO_CONTEXT) {
-        LOGE("createContext failed.");
+        LOGE("egl_createContext failed.");
         eglTerminate(glContext->eglDisplay);
         glContext->eglDisplay = nullptr;
         return EGL_FALSE;
     }
 
-    LOGI("createContext success: %p", glContext->eglContext);
+    LOGI("egl_createContext success: %p", glContext->eglContext);
     return EGL_TRUE;
 }
 
@@ -91,11 +91,11 @@ EGLBoolean egl_createSurface(JNIEnv *env, GLContext *glContext, jobject surface,
 
     ANativeWindow_release(nativeWindow);
     if (glContext->eglSurface[index] == EGL_NO_SURFACE) {
-        LOGE("eglCreateSurface failed.");
+        LOGE("egl_createSurface failed.");
         return EGL_FALSE;
     }
 
-    LOGI("eglCreateSurface success: %p", glContext->eglSurface[index]);
+    LOGI("egl_createSurface success: %p", glContext->eglSurface[index]);
     return EGL_TRUE;
 }
 
@@ -108,7 +108,7 @@ EGLBoolean egl_makeCurrent(GLContext *glContext, EGLSurface eglSurface) {
     );
 
     if (ret != EGL_TRUE) {
-        LOGE("makeCurrent failed.");
+        LOGE("egl_makeCurrent failed.");
         return EGL_FALSE;
     }
 

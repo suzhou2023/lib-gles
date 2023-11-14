@@ -9,7 +9,7 @@ import android.content.res.AssetManager
  */
 object JniGL {
     init {
-        System.loadLibrary("opengl-bbt")
+        System.loadLibrary("gl-bbt")
     }
 
     /**

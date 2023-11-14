@@ -5,7 +5,10 @@ import android.util.AttributeSet
 import android.view.SurfaceView
 
 
-open class AutoFitSurfaceView(context: Context, attrs: AttributeSet? = null) : SurfaceView(context, attrs) {
+open class AutoFitSurfaceView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null
+) : SurfaceView(context, attrs) {
 
     private var ratioWidth = 0
     private var ratioHeight = 0

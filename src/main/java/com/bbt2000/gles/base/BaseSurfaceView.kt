@@ -14,21 +14,21 @@ import com.bbt2000.gles.widget.AutoFitSurfaceView
  *  date : 2023/11/12
  *  description :
  */
-open class BaseSurfaceView(
+open class BaseSurfaceView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null
 ) : AutoFitSurfaceView(context, attrs), SurfaceHolder.Callback {
 
-    private var glContext: Long = 0
+    var glContext: Long = 0
     private val handlerThread: HandlerThread by lazy { HandlerThread("gl-render").apply { start() } }
-    private val handler: Handler = Handler(handlerThread.looper)
+    val glHandler: Handler by lazy { Handler(handlerThread.looper) }
 
     init {
         holder.addCallback(this)
     }
 
     override fun surfaceCreated(holder: SurfaceHolder) {
-        handler.post {
+        glHandler.post {
             glContext = JniGL.nativeCreateGLContext(assetManager = context.assets)
             if (glContext <= 0) return@post
             JniGL.nativeEGLCreateSurface(glContext, holder.surface, 0)
@@ -41,7 +41,7 @@ open class BaseSurfaceView(
     }
 
     override fun surfaceDestroyed(holder: SurfaceHolder) {
-        handler.post {
+        glHandler.post {
             JniGL.nativeDestroyGLContext(glContext)
         }
     }
