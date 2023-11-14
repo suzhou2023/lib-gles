@@ -12,9 +12,9 @@
 #include "android_log.h"
 
 
-void fboUtil_createFbo(uint32_t width, uint32_t height, GLuint *fbo, GLuint *tex_2d) {
+void fbo_createFbo(uint32_t width, uint32_t height, GLuint *fbo, GLuint *tex_2d) {
 
-    genTex2D(tex_2d);
+    gl_genTex2D(tex_2d);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 
     glGenFramebuffers(1, fbo);

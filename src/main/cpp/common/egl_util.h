@@ -11,11 +11,11 @@
 #include "GLContext.h"
 
 
-EGLBoolean createContext(GLContext *glContext, EGLContext shareContext);
+EGLBoolean egl_createContext(GLContext *glContext, EGLContext shareContext);
 
-EGLBoolean eglCreateSurface(JNIEnv *env, GLContext *glContext, jobject surface, EGLint index);
+EGLBoolean egl_createSurface(JNIEnv *env, GLContext *glContext, jobject surface, EGLint index);
 
-EGLBoolean makeCurrent(GLContext *glContext, EGLSurface eglSurface);
+EGLBoolean egl_makeCurrent(GLContext *glContext, EGLSurface eglSurface);
 
 
 #endif //ANDROIDBOILERPLATE_EGL_UTIL_H

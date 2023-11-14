@@ -4,13 +4,11 @@
  *  description : 
  */
 
-#include <jni.h>
-#include <EGL/egl.h>
-#include <android/asset_manager_jni.h>
-#include <GLES3/gl3.h>
-#include <GLES2/gl2ext.h>
-#include "asset_util.cpp"
+
 #include "GLContext.h"
+#include <GLES2/gl2ext.h>
+
+#include "asset_util.h"
 #include "egl_util.h"
 #include "gl_util.h"
 #include "shader_util.h"
@@ -27,7 +25,7 @@ jlong GLContext::create(JNIEnv *env, jlong other_glcontext, jobject asset_manage
     }
 
     auto *glContext = new GLContext();
-    EGLBoolean ret = createContext(glContext, shareContext);
+    EGLBoolean ret = egl_createContext(glContext, shareContext);
     if (ret <= 0) {
         delete glContext;
         return reinterpret_cast<jlong>(nullptr);
@@ -46,16 +44,16 @@ jboolean GLContext::createEglSurface(JNIEnv *env, jlong gl_context, jobject surf
     if (gl_context <= 0) return EGL_FALSE;
     auto *glContext = reinterpret_cast<GLContext *>(gl_context);
 
-    EGLBoolean ret = eglCreateSurface(env, glContext, surface, index);
+    EGLBoolean ret = egl_createSurface(env, glContext, surface, index);
     if (ret == EGL_TRUE) {
-        makeCurrent(glContext, glContext->eglSurface[index]);
+        egl_makeCurrent(glContext, glContext->eglSurface[index]);
         return EGL_TRUE;
     }
 
     return EGL_FALSE;
 }
 
-void GLContext::glCreateProgram(JNIEnv *env, jobject thiz, jlong gl_context, jstring vName, jstring fName, jint index) {
+void GLContext::createProgram(JNIEnv *env, jobject thiz, jlong gl_context, jstring vName, jstring fName, jint index) {
 
     if (gl_context <= 0) return;
     auto *glContext = reinterpret_cast<GLContext *>(gl_context);
@@ -64,15 +62,15 @@ void GLContext::glCreateProgram(JNIEnv *env, jobject thiz, jlong gl_context, jst
     const char *v_name = env->GetStringUTFChars(vName, nullptr);
     const char *f_name = env->GetStringUTFChars(fName, nullptr);
 
-    GLubyte *buf_v = readFile(glContext->assetManager, v_name);
-    GLubyte *buf_f = readFile(glContext->assetManager, f_name);
+    GLubyte *buf_v = asset_readFile(glContext->assetManager, v_name);
+    GLubyte *buf_f = asset_readFile(glContext->assetManager, f_name);
 
     // 释放字符串
     env->ReleaseStringUTFChars(vName, v_name);
     env->ReleaseStringUTFChars(fName, f_name);
 
-    GLuint program = createProgram(reinterpret_cast<const char *>(buf_v),
-                                   reinterpret_cast<const char *>(buf_f));
+    GLuint program = shader_createProgram(reinterpret_cast<const char *>(buf_v),
+                                          reinterpret_cast<const char *>(buf_f));
 
     // 释放字符数组
     delete buf_v;
@@ -105,13 +103,13 @@ void GLContext::loadVertices(jlong gl_context) {
     };
     // vbo, ebo
     GLuint vbo, ebo;
-    genBuffer(&vbo, vertices, sizeof(vertices));
+    gl_genBuffer(&vbo, vertices, sizeof(vertices));
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) 0);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) (3 * 4));
     glEnableVertexAttribArray(1);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-    genIndexBuffer(&ebo, indices, sizeof(indices));
+    gl_genIndexBuffer(&ebo, indices, sizeof(indices));
     glContext->vbo[0] = vbo;
     glContext->ebo[0] = ebo;
 
@@ -163,7 +161,7 @@ void GLContext::createFbo(jlong gl_context, jint width, jint height) {
     auto *glContext = reinterpret_cast<GLContext *>(gl_context);
 
     GLuint fbo, texture;
-    genTex2D(&texture);
+    gl_genTex2D(&texture);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
     glGenFramebuffers(1, &fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);

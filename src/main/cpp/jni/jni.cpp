@@ -9,10 +9,9 @@
 #include <GLES2/gl2ext.h>
 #include <android/native_window_jni.h>
 #include <cstring>
-#include "../common/asset_util.cpp"
-#include "../common/GLContext.h"
-#include "EglUtil.h"
-#include "../common/gl_util.c"
+#include "GLContext.h"
+#include "egl_util.h"
+#include "gl_util.h"
 
 
 extern "C"
@@ -145,13 +144,13 @@ Java_com_bbt2000_gles_jni_JniGL_nativeDrawFrame(
     glUseProgram(glContext->program[0]);
     glActiveTexture(GL_TEXTURE0);
     if (glContext->eglSurface[0] != nullptr) {
-        eglUtil.makeCurrent(glContext, glContext->eglSurface[0]);
-        glUtil.drawElements(6);
+        egl_makeCurrent(glContext, glContext->eglSurface[0]);
+        gl_drawElements(6);
         eglSwapBuffers(glContext->eglDisplay, glContext->eglSurface[0]);
     }
     if (glContext->eglSurface[1] != nullptr) {
-        eglUtil.makeCurrent(glContext, glContext->eglSurface[1]);
-        glUtil.drawElements(6);
+        egl_makeCurrent(glContext, glContext->eglSurface[1]);
+        gl_drawElements(6);
         eglSwapBuffers(glContext->eglDisplay, glContext->eglSurface[1]);
     }
 }

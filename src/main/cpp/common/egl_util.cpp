@@ -10,7 +10,7 @@
 #include <android/native_window_jni.h>
 
 
-EGLBoolean createContext(GLContext *glContext, EGLContext shareContext) {
+EGLBoolean egl_createContext(GLContext *glContext, EGLContext shareContext) {
     glContext->eglDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY);
     if (glContext->eglDisplay == EGL_NO_DISPLAY) {
         LOGE("eglGetDisplay failed.");
@@ -68,7 +68,7 @@ EGLBoolean createContext(GLContext *glContext, EGLContext shareContext) {
     return EGL_TRUE;
 }
 
-EGLBoolean eglCreateSurface(JNIEnv *env, GLContext *glContext, jobject surface, EGLint index) {
+EGLBoolean egl_createSurface(JNIEnv *env, GLContext *glContext, jobject surface, EGLint index) {
     if (index >= sizeof(glContext->eglSurface) / sizeof(glContext->eglSurface[0])) {
         return EGL_FALSE;
     }
@@ -99,7 +99,7 @@ EGLBoolean eglCreateSurface(JNIEnv *env, GLContext *glContext, jobject surface, 
     return EGL_TRUE;
 }
 
-EGLBoolean makeCurrent(GLContext *glContext, EGLSurface eglSurface) {
+EGLBoolean egl_makeCurrent(GLContext *glContext, EGLSurface eglSurface) {
     EGLBoolean ret = eglMakeCurrent(
             glContext->eglDisplay,
             eglSurface,
@@ -114,3 +114,41 @@ EGLBoolean makeCurrent(GLContext *glContext, EGLSurface eglSurface) {
 
     return EGL_TRUE;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

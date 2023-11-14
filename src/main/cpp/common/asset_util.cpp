@@ -9,7 +9,7 @@
 
 
 // 返回字符数组，用完后需要手动调用delete释放空间
-GLubyte *readFile(AAssetManager *assetManager, const char *filename) {
+GLubyte *asset_readFile(AAssetManager *assetManager, const char *filename) {
     AAsset *aAsset = AAssetManager_open(assetManager, filename, AASSET_MODE_BUFFER);
     off_t len = AAsset_getLength(aAsset);
     LOGD("readFile, len = %ld", len);

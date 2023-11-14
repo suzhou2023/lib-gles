@@ -12,6 +12,7 @@
 #include <GLES3/gl3.h>
 #include <cstdlib>
 #include <android/asset_manager.h>
+#include "android_log.h"
 
 
 class GLContext {
@@ -21,7 +22,7 @@ public:
 
     static jboolean createEglSurface(JNIEnv *env, jlong gl_context, jobject surface, jint index);
 
-    static void glCreateProgram(JNIEnv *env, jobject thiz, jlong gl_context, jstring vName, jstring fName, jint index);
+    static void createProgram(JNIEnv *env, jobject thiz, jlong gl_context, jstring vName, jstring fName, jint index);
 
     static void loadVertices(jlong gl_context);
 

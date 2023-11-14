@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.22.1)
 
-set(PROJECT_NAME opengl-bbt)
+set(PROJECT_NAME gl-bbt)
 
 project(${PROJECT_NAME} VERSION 1.0)
 
@@ -11,6 +11,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # 头文件
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/common")
 
 
 # opengl相关api编译成so
@@ -24,7 +25,7 @@ add_library(
         common/asset_util.cpp
         common/egl_util.cpp
         common/fbo_util.cpp
-        common/gl_util.c
+        common/gl_util.cpp
         common/shader_util.cpp
 )
 
@@ -41,6 +42,18 @@ target_link_libraries(
         # android log
         log
 )
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

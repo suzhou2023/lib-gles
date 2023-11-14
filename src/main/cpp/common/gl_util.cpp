@@ -14,7 +14,7 @@
      * @param data
      * @param size
      */
-void genBuffer(GLuint *vbo, float data[], GLuint size) {
+void gl_genBuffer(GLuint *vbo, float data[], GLuint size) {
     // 创建缓冲对象
     glGenBuffers(1, vbo);
     // 绑定缓冲对象
@@ -29,7 +29,7 @@ void genBuffer(GLuint *vbo, float data[], GLuint size) {
  * @param data
  * @param size
  */
-void genIndexBuffer(GLuint *ebo, GLuint data[], GLuint size) {
+void gl_genIndexBuffer(GLuint *ebo, GLuint data[], GLuint size) {
     // 创建缓冲对象
     glGenBuffers(1, ebo);
     // 绑定索引缓冲对象
@@ -42,7 +42,7 @@ void genIndexBuffer(GLuint *ebo, GLuint data[], GLuint size) {
  * 创建2d纹理对象，绑定和配置
  * @param tex_2d
  */
-void genTex2D(GLuint *tex_2d) {
+void gl_genTex2D(GLuint *tex_2d) {
     // 创建纹理对象
     glGenTextures(1, tex_2d);
     // 绑定一个纹理对象
@@ -62,7 +62,7 @@ void genTex2D(GLuint *tex_2d) {
  * @param env
  * @param bitmap
  */
-void texImage2D(JNIEnv *env, jobject bitmap, uint32_t *width, uint32_t *height) {
+void gl_texImage2D(JNIEnv *env, jobject bitmap, uint32_t *width, uint32_t *height) {
     // 获取bitmap的信息和数据的指针
     AndroidBitmapInfo bitmapInfo;
     if (AndroidBitmap_getInfo(env, bitmap, &bitmapInfo) < 0) {
@@ -94,7 +94,7 @@ void texImage2D(JNIEnv *env, jobject bitmap, uint32_t *width, uint32_t *height) 
  * 绘制
  * @param vertexNum
  */
-void drawElements(GLuint vertexNum) {
+void gl_drawElements(GLuint vertexNum) {
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
     glDrawElements(GL_TRIANGLES, vertexNum, GL_UNSIGNED_INT, (void *) 0);
