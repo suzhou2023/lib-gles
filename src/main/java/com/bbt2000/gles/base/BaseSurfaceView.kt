@@ -47,6 +47,7 @@ open class BaseSurfaceView @JvmOverloads constructor(
         glHandler.post {
             JniGL.nativeDestroyGLContext(glContext)
         }
+        glHandler.looper.quitSafely()
     }
 }
 
