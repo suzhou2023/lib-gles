@@ -42,46 +42,39 @@ public:
         if (fboTexture > 0) {
             glDeleteTextures(1, &fboTexture);
             LOGI("GL delete texture: %d", fboTexture);
-            fboTexture = 0;
         }
         if (oesTexture > 0) {
             glDeleteTextures(1, &oesTexture);
             LOGI("GL delete texture: %d", oesTexture);
-            oesTexture = 0;
         }
         for (int i = 0; i < sizeof(texture) / sizeof(texture[0]); i++) {
             if (texture[i] > 0) {
                 glDeleteTextures(1, &texture[i]);
                 LOGI("GL delete texture: %d", texture[i]);
-                oesTexture = 0;
             }
         }
         for (int i = 0; i < sizeof(fbo) / sizeof(fbo[0]); i++) {
             if (fbo[i] > 0) {
                 glDeleteFramebuffers(1, &fbo[i]);
                 LOGI("GL delete frame buffer: %d", fbo[i]);
-                fbo[i] = 0;
             }
         }
         for (int i = 0; i < sizeof(ebo) / sizeof(ebo[0]); i++) {
             if (ebo[i] > 0) {
                 glDeleteBuffers(1, &ebo[i]);
                 LOGI("GL delete buffer: %d", ebo[i]);
-                ebo[i] = 0;
             }
         }
         for (int i = 0; i < sizeof(vbo) / sizeof(vbo[0]); i++) {
             if (vbo[i] > 0) {
                 glDeleteBuffers(1, &vbo[i]);
                 LOGI("GL delete buffer: %d", vbo[i]);
-                vbo[i] = 0;
             }
         }
         for (int i = 0; i < sizeof(program) / sizeof(program[0]); i++) {
             if (program[i] > 0) {
                 glDeleteProgram(program[i]);
                 LOGI("GL delete program: %d", program[i]);
-                program[i] = 0;
             }
         }
         if (eglDisplay != nullptr) {
@@ -107,7 +100,6 @@ public:
         if (frame_data != nullptr) {
             free(frame_data);
             LOGI("Free frame data space success.");
-            frame_data = nullptr;
         }
     };
 

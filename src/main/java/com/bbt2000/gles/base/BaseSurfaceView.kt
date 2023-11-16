@@ -19,15 +19,18 @@ open class BaseSurfaceView @JvmOverloads constructor(
     attrs: AttributeSet? = null
 ) : AutoFitSurfaceView(context, attrs), SurfaceHolder.Callback {
 
+    private lateinit var handlerThread: HandlerThread
+    lateinit var glHandler: Handler
     var glContext: Long = 0
-    private val handlerThread: HandlerThread by lazy { HandlerThread("gl-render").apply { start() } }
-    val glHandler: Handler by lazy { Handler(handlerThread.looper) }
 
-    init {
+    fun addCallback() {
         holder.addCallback(this)
     }
 
     override fun surfaceCreated(holder: SurfaceHolder) {
+        handlerThread = HandlerThread("gl-render").apply { start() }
+        glHandler = Handler(handlerThread.looper)
+
         glHandler.post {
             glContext = JniGL.nativeCreateGLContext(assetManager = context.assets)
             if (glContext <= 0) return@post
@@ -44,10 +47,6 @@ open class BaseSurfaceView @JvmOverloads constructor(
         glHandler.post {
             JniGL.nativeDestroyGLContext(glContext)
         }
-    }
-
-    companion object {
-        val TAG = BaseSurfaceView::class.simpleName
     }
 }
 
