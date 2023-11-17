@@ -156,16 +156,11 @@ void GLContext::configMatrix(
         int scale_type, // 缩放类型：1 - crop, 2 - fit
         bool rotate // 是否旋转
 ) {
-    LOGE("frame_w = %d", frame_w);
-    LOGE("frame_h = %d", frame_h);
-    LOGE("window_w = %d", window_w);
-    LOGE("window_h = %d", window_h);
-
     // 顶点坐标变换矩阵变量名
     GLint m_location = glGetUniformLocation(program[program_index], "v_matrix");
-    // 是否旋转
-    bool rotate2 = ((frame_w > frame_h && window_w < window_h) || (frame_w < frame_h && window_w > window_h)) && rotate;
-    if (rotate2) {
+    // 比例合适才旋转
+    bool really_rotate = ((frame_w > frame_h && window_w < window_h) || (frame_w < frame_h && window_w > window_h)) && rotate;
+    if (really_rotate) {
         // 顺时针旋转90度矩阵，列主序
         float m_rotate90[16] = {
                 0.0, -1.0, 0.0, 0.0,
@@ -189,33 +184,31 @@ void GLContext::configMatrix(
     GLint tex_location = glGetUniformLocation(program[program_index], "tex_matrix");
     // 根据是否旋转，ratio_x和ratio_y取值不一样
     float ratio_x, ratio_y;
-    if (rotate2) {
-        ratio_x = (float) frame_h / window_w;
-        ratio_y = (float) frame_w / window_h;
+    if (!really_rotate) {
+        ratio_x = (float) window_w / frame_w;
+        ratio_y = (float) window_h / frame_h;
     } else {
-        ratio_x = (float) frame_w / window_w;
-        ratio_y = (float) frame_h / window_h;
+        ratio_x = (float) window_w / frame_h;
+        ratio_y = (float) window_h / frame_w;
     }
-    LOGE("ratio_x = %f", ratio_x);
-    LOGE("ratio_y = %f", ratio_y);
-    LOGE("scale_type = %d", scale_type);
+    
     // 先搞清楚一种情况，其它很类似
-    if (ratio_x > ratio_y && scale_type == 1 || ratio_x < ratio_y && scale_type == 2) {
-        float max_x = ratio_x / ratio_y; // 归一化的纹理坐标x最大值(缩放系数)
+    if (ratio_x < ratio_y && scale_type == 1 || ratio_y < ratio_x && scale_type == 2) {
+        float scale_x = ratio_x / ratio_y; // 缩放系数
         // 缩放+平移得到矩阵(列主序)
         float m_tex[9] = {
-                max_x, 0.0, 0.0,
+                scale_x, 0.0, 0.0,
                 0.0, 1.0, 0.0,
-                static_cast<float>(-(max_x - 1.0) / 2), 0.0, 1.0,
+                static_cast<float>((1.0 - scale_x) / 2), 0.0, 1.0,
         };
         glUniformMatrix3fv(tex_location, 1, false, m_tex);
     }
-    if (ratio_x > ratio_y && scale_type == 2 || ratio_x < ratio_y && scale_type == 1) {
-        float max_y = ratio_y / ratio_x; // 归一化的纹理坐标y最大值(缩放系数)
+    if (ratio_y < ratio_x && scale_type == 1 || ratio_x < ratio_y && scale_type == 2) {
+        float scale_y = ratio_y / ratio_x; // 缩放系数
         float m_tex[9] = {
                 1.0, 0.0, 0.0,
-                0.0, max_y, 0.0,
-                0.0, static_cast<float>((1.0 - max_y) / 2), 1.0,
+                0.0, scale_y, 0.0,
+                0.0, static_cast<float>((1.0 - scale_y) / 2), 1.0,
         };
         glUniformMatrix3fv(tex_location, 1, false, m_tex);
     }
