@@ -80,6 +80,19 @@ object JniGL {
      */
     external fun nativeSetMatrix(glContext: Long, matrix: FloatArray)
 
+
+    // 矩阵设置：根据图形和窗口的尺寸设置合适的矩阵
+    external fun setMatrix(
+        glContext: Long,
+        programIndex: Int = 0, // 程序的索引
+        frameW: Int, // 帧宽度
+        frameH: Int, // 帧高度
+        windowW: Int, // 窗口宽度
+        windowH: Int, // 窗口高度
+        scaleType: Int = 1, // 缩放类型：1 - crop，2 - fit
+        rotate: Boolean = true, // 是否旋转
+    )
+
     /**
      * 绘制
      *

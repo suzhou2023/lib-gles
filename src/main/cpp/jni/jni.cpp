@@ -85,6 +85,18 @@ Java_com_bbt2000_gles_jni_JniGL_nativeSetMatrix(
 
 extern "C"
 JNIEXPORT void JNICALL
+Java_com_bbt2000_gles_jni_JniGL_setMatrix(JNIEnv *env, jobject thiz, jlong gl_context, jint program_index,
+                                          jint frame_w, jint frame_h, jint window_w, jint window_h,
+                                          jint scale_type, jboolean rotate) {
+    if (gl_context <= 0) return;
+    auto *glContext = reinterpret_cast<GLContext *>(gl_context);
+
+    gl_setMatrix(glContext->program[program_index], frame_w, frame_h, window_w, window_h, scale_type, rotate);
+}
+
+
+extern "C"
+JNIEXPORT void JNICALL
 Java_com_bbt2000_gles_jni_JniGL_nativeDrawFrame(
         JNIEnv *env, jobject thiz, jlong gl_context) {
     if (gl_context <= 0) return;
@@ -163,6 +175,24 @@ Java_com_bbt2000_gles_jni_JniGL_nativeDestroyGLContext(
 
     return GLContext::destroy(gl_context);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
