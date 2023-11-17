@@ -32,10 +32,10 @@ open class BaseSurfaceView @JvmOverloads constructor(
         glHandler = Handler(handlerThread.looper)
 
         glHandler.post {
-            glContext = JniGL.nativeCreateGLContext(assetManager = context.assets)
+            glContext = JniGL.createGLContext(assetManager = context.assets)
             if (glContext <= 0) return@post
-            JniGL.nativeEGLCreateSurface(glContext, holder.surface, 0)
-            JniGL.nativeLoadVertices(glContext)
+            JniGL.createEGLSurface(glContext, holder.surface, 0)
+            JniGL.loadVertices(glContext)
         }
     }
 
@@ -45,7 +45,7 @@ open class BaseSurfaceView @JvmOverloads constructor(
 
     override fun surfaceDestroyed(holder: SurfaceHolder) {
         glHandler.post {
-            JniGL.nativeDestroyGLContext(glContext)
+            JniGL.destroyGLContext(glContext)
         }
         glHandler.looper.quitSafely()
     }

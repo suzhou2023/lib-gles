@@ -7,88 +7,53 @@
 
 #include "GLContext.h"
 #include <GLES2/gl2ext.h>
-
 #include "asset_util.h"
 #include "egl_util.h"
 #include "gl_util.h"
 #include "shader_util.h"
 
 
-jlong GLContext::create(JNIEnv *env, jlong other_glcontext, jobject asset_manager) {
-
-    EGLContext shareContext = EGL_NO_CONTEXT;
-    if (other_glcontext > 0) {
-        auto *otherGLContext = reinterpret_cast<GLContext *>(other_glcontext);
-        if (otherGLContext->eglContext != nullptr) {
-            shareContext = otherGLContext->eglContext;
-        }
-    }
-
-    auto *glContext = new GLContext();
-    EGLBoolean ret = egl_createContext(glContext, shareContext);
-    if (ret <= 0) {
-        delete glContext;
-        return reinterpret_cast<jlong>(nullptr);
-    }
-
-    // 保存assetManager
-    glContext->assetManager = AAssetManager_fromJava(env, asset_manager);
-    LOGI("GLContext::create success.");
-
-    return reinterpret_cast<jlong>(glContext);
-}
-
-
-jboolean GLContext::createEglSurface(JNIEnv *env, jlong gl_context, jobject surface, jint index) {
-
-    if (gl_context <= 0) return EGL_FALSE;
-    auto *glContext = reinterpret_cast<GLContext *>(gl_context);
-
-    EGLBoolean ret = egl_createSurface(env, glContext, surface, index);
+// 创建EGLSurface
+bool GLContext::createEGLSurface(JNIEnv *env, jobject surface, jint index) {
+    EGLBoolean ret = egl_createSurface(env, this, surface, index);
     if (ret == EGL_TRUE) {
-        egl_makeCurrent(glContext, glContext->eglSurface[index]);
-        return EGL_TRUE;
+        egl_makeCurrent(this, eglSurface[index]);
+        return true;
     }
-
-    return EGL_FALSE;
+    return false;
 }
 
-void GLContext::createProgram(JNIEnv *env, jobject thiz, jlong gl_context, jstring vName, jstring fName, jint index) {
 
-    if (gl_context <= 0) return;
-    auto *glContext = reinterpret_cast<GLContext *>(gl_context);
+// 创建着色器程序
+int GLContext::createProgram(JNIEnv *env, jobject thiz, jstring v_name, jstring f_name, jint index) {
+    // 转c字符串
+    const char *v_name_str = env->GetStringUTFChars(v_name, nullptr);
+    const char *f_name_str = env->GetStringUTFChars(f_name, nullptr);
 
-    // jstring转c字符串
-    const char *v_name = env->GetStringUTFChars(vName, nullptr);
-    const char *f_name = env->GetStringUTFChars(fName, nullptr);
-
-    GLubyte *buf_v = asset_readFile(glContext->assetManager, v_name);
-    GLubyte *buf_f = asset_readFile(glContext->assetManager, f_name);
+    GLubyte *buf_v = asset_readFile(assetManager, v_name_str);
+    GLubyte *buf_f = asset_readFile(assetManager, f_name_str);
 
     // 释放字符串
-    env->ReleaseStringUTFChars(vName, v_name);
-    env->ReleaseStringUTFChars(fName, f_name);
+    env->ReleaseStringUTFChars(v_name, v_name_str);
+    env->ReleaseStringUTFChars(f_name, f_name_str);
 
     GLuint program = shader_createProgram(reinterpret_cast<const char *>(buf_v),
                                           reinterpret_cast<const char *>(buf_f));
-
     // 释放字符数组
     delete buf_v;
     delete buf_f;
 
-    if (program <= 0) return;
-    glContext->program[index] = program;
+    if (program <= 0) return -1;
+    this->program[index] = program;
+    // 使用program
     glUseProgram(program);
-
     LOGI("GLContext::createProgram success.");
+    return 0;
 }
 
 
-void GLContext::loadVertices(jlong gl_context) {
-    if (gl_context <= 0) return;
-    auto *glContext = reinterpret_cast<GLContext *>(gl_context);
-
-    // 顶点坐标和纹理坐标
+// 加载顶点坐标和纹理坐标
+void GLContext::loadVertices() {
     float vertices[] = {
             // 前3个图元顶点坐标，后两个纹理坐标
             1.0f, 1.0f, 0.0f, 1.0f, 1.0f, // top right
@@ -110,56 +75,34 @@ void GLContext::loadVertices(jlong gl_context) {
     glEnableVertexAttribArray(1);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     gl_genIndexBuffer(&ebo, indices, sizeof(indices));
-    glContext->vbo[0] = vbo;
-    glContext->ebo[0] = ebo;
-
+    this->vbo[0] = vbo;
+    this->ebo[0] = ebo;
     LOGI("GLContext::loadVertices success.");
 }
 
 
-void GLContext::surfaceChanged(jlong gl_context, jint format, jint width, jint height) {
-    if (gl_context <= 0) return;
-    auto *glContext = reinterpret_cast<GLContext *>(gl_context);
-
-    glContext->format = format;
-    glContext->width = width;
-    glContext->height = height;
-
-    // todo: 不太好
-    glContext->frame_data = static_cast<GLubyte *>(malloc(width * height * 4));
-}
-
-
-jint GLContext::createOesTexture(jlong gl_context) {
-    if (gl_context <= 0) return -1;
-    auto *glContext = reinterpret_cast<GLContext *>(gl_context);
-
+// 创建oes纹理
+int GLContext::createOesTexture() {
     GLuint texture;
     glGenTextures(1, &texture);
     // todo: OES纹理似乎是永久绑定？
     glBindTexture(GL_TEXTURE_EXTERNAL_OES, texture);
     // 着色器变量赋值
-    glUseProgram(glContext->program[0]);
+    glUseProgram(program[0]);
     // OES纹理单元(图层)赋值。
     // 不赋值的话，后面绘制的时候openGL会默认帮你激活图层0，我们再激活其它图层也是多余的。
     // 但是你一旦赋值，后面要激活的图层必须是这个值。
     // 配合FBO使用的时候，貌似只能设置为图层0。(目前测试结果，有待确认)
-    glUniform1i(glGetUniformLocation(glContext->program[0], "oesTexture"), 0);
-    glUseProgram(glContext->program[1]);
-    // 2D纹理图层赋值。
-    glUniform1i(glGetUniformLocation(glContext->program[1], "layer"), 1);
+    glUniform1i(glGetUniformLocation(program[0], "oes_texture"), 0);
 
-    glContext->oesTexture = texture;
+    oesTexture = texture;
     LOGI("GLContext::createOesTexture success.");
-
     return texture;
 }
 
 
-void GLContext::createFbo(jlong gl_context, jint width, jint height) {
-    if (gl_context <= 0) return;
-    auto *glContext = reinterpret_cast<GLContext *>(gl_context);
-
+// 创建fbo
+void GLContext::createFbo(int width, int height, int index) {
     GLuint fbo, texture;
     gl_genTex2D(&texture);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
@@ -178,13 +121,13 @@ void GLContext::createFbo(jlong gl_context, jint width, jint height) {
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    glContext->fbo[0] = fbo;
-    glContext->fboTexture = texture;
-
+    this->fbo[index] = fbo;
+    this->fboTexture[index] = texture;
     LOGI("GLContext::createFbo success.");
 }
 
 
+// 设置矩阵
 void GLContext::setMatrix(JNIEnv *env, jlong gl_context, jfloatArray matrix) {
     if (gl_context <= 0) return;
     auto *glContext = reinterpret_cast<GLContext *>(gl_context);
@@ -197,22 +140,86 @@ void GLContext::setMatrix(JNIEnv *env, jlong gl_context, jfloatArray matrix) {
             p[12], p[13], p[14], p[15]
     };
     glUseProgram(glContext->program[0]);
-    GLint matrixLocation = glGetUniformLocation(glContext->program[0], "matrix");
+    GLint matrixLocation = glGetUniformLocation(glContext->program[0], "v_matrix");
     glUniformMatrix4fv(matrixLocation, 1, GL_FALSE, array);
-
     LOGI("GLContext::setMatrix success.");
 }
 
 
-void GLContext::destroy(jlong gl_context) {
-    if (gl_context <= 0) return;
-    auto *glContext = reinterpret_cast<GLContext *>(gl_context);
+// 矩阵配置：根据图形和窗口的尺寸配置合适的矩阵(顶点坐标变换矩阵、纹理坐标变换矩阵)
+void GLContext::configMatrix(
+        int program_index, // 程序索引
+        int frame_w, // 帧宽度
+        int frame_h, // 帧高度
+        int window_w, // 窗口宽度
+        int window_h, // 窗口高度
+        int scale_type, // 缩放类型：1 - crop, 2 - fit
+        bool rotate // 是否旋转
+) {
+    LOGE("frame_w = %d", frame_w);
+    LOGE("frame_h = %d", frame_h);
+    LOGE("window_w = %d", window_w);
+    LOGE("window_h = %d", window_h);
 
-    delete glContext;
+    // 顶点坐标变换矩阵变量名
+    GLint m_location = glGetUniformLocation(program[program_index], "v_matrix");
+    // 是否旋转
+    bool rotate2 = ((frame_w > frame_h && window_w < window_h) || (frame_w < frame_h && window_w > window_h)) && rotate;
+    if (rotate2) {
+        // 顺时针旋转90度矩阵，列主序
+        float m_rotate90[16] = {
+                0.0, -1.0, 0.0, 0.0,
+                1.0, 0.0, 0.0, 0.0,
+                0.0, 0.0, 1.0, 0.0,
+                0.0, 0.0, 0.0, 1.0
+        };
+        glUniformMatrix4fv(m_location, 1, false, m_rotate90);
+    } else {
+        // 单位矩阵
+        float m_identity[16] = {
+                1.0, 0.0, 0.0, 0.0,
+                0.0, 1.0, 0.0, 0.0,
+                0.0, 0.0, 1.0, 0.0,
+                0.0, 0.0, 0.0, 1.0
+        };
+        glUniformMatrix4fv(m_location, 1, false, m_identity);
+    }
+
+    // 纹理坐标变换矩阵变量名
+    GLint tex_location = glGetUniformLocation(program[program_index], "tex_matrix");
+    // 根据是否旋转，ratio_x和ratio_y取值不一样
+    float ratio_x, ratio_y;
+    if (rotate2) {
+        ratio_x = (float) frame_h / window_w;
+        ratio_y = (float) frame_w / window_h;
+    } else {
+        ratio_x = (float) frame_w / window_w;
+        ratio_y = (float) frame_h / window_h;
+    }
+    LOGE("ratio_x = %f", ratio_x);
+    LOGE("ratio_y = %f", ratio_y);
+    LOGE("scale_type = %d", scale_type);
+    // 先搞清楚一种情况，其它很类似
+    if (ratio_x > ratio_y && scale_type == 1 || ratio_x < ratio_y && scale_type == 2) {
+        float max_x = ratio_x / ratio_y; // 归一化的纹理坐标x最大值(缩放系数)
+        // 缩放+平移得到矩阵(列主序)
+        float m_tex[9] = {
+                max_x, 0.0, 0.0,
+                0.0, 1.0, 0.0,
+                static_cast<float>(-(max_x - 1.0) / 2), 0.0, 1.0,
+        };
+        glUniformMatrix3fv(tex_location, 1, false, m_tex);
+    }
+    if (ratio_x > ratio_y && scale_type == 2 || ratio_x < ratio_y && scale_type == 1) {
+        float max_y = ratio_y / ratio_x; // 归一化的纹理坐标y最大值(缩放系数)
+        float m_tex[9] = {
+                1.0, 0.0, 0.0,
+                0.0, max_y, 0.0,
+                0.0, static_cast<float>((1.0 - max_y) / 2), 1.0,
+        };
+        glUniformMatrix3fv(tex_location, 1, false, m_tex);
+    }
 }
-
-
-
 
 
 

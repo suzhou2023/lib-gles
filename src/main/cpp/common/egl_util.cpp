@@ -10,18 +10,18 @@
 #include <android/native_window_jni.h>
 
 
-EGLBoolean egl_createContext(GLContext *glContext, EGLContext shareContext) {
+bool egl_createContext(GLContext *glContext, EGLContext shareContext) {
     glContext->eglDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY);
     if (glContext->eglDisplay == EGL_NO_DISPLAY) {
         LOGE("eglGetDisplay failed.");
-        return EGL_FALSE;
+        return false;
     }
 
     if (eglInitialize(glContext->eglDisplay, nullptr, nullptr) != EGL_TRUE) {
         LOGE("eglInitialize failed");
         eglTerminate(glContext->eglDisplay);
         glContext->eglDisplay = nullptr;
-        return EGL_FALSE;
+        return false;
     }
 
     EGLConfig eglConfig;
@@ -45,7 +45,7 @@ EGLBoolean egl_createContext(GLContext *glContext, EGLContext shareContext) {
         LOGE("eglChooseConfig failed.");
         eglTerminate(glContext->eglDisplay);
         glContext->eglDisplay = nullptr;
-        return EGL_FALSE;
+        return false;
     } else {
         glContext->eglConfig = eglConfig;
     }
@@ -61,22 +61,22 @@ EGLBoolean egl_createContext(GLContext *glContext, EGLContext shareContext) {
         LOGE("egl_createContext failed.");
         eglTerminate(glContext->eglDisplay);
         glContext->eglDisplay = nullptr;
-        return EGL_FALSE;
+        return false;
     }
 
     LOGI("egl_createContext success: %p", glContext->eglContext);
-    return EGL_TRUE;
+    return true;
 }
 
-EGLBoolean egl_createSurface(JNIEnv *env, GLContext *glContext, jobject surface, EGLint index) {
+bool egl_createSurface(JNIEnv *env, GLContext *glContext, jobject surface, EGLint index) {
     if (index >= sizeof(glContext->eglSurface) / sizeof(glContext->eglSurface[0])) {
-        return EGL_FALSE;
+        return false;
     }
 
     // 销毁之前的EGLSurface
     if (glContext->eglSurface[index] != nullptr) {
         EGLBoolean ret = eglDestroySurface(glContext->eglDisplay, glContext->eglSurface[index]);
-        if (ret == EGL_TRUE) {
+        if (ret == false) {
             LOGI("eglDestroySurface success: %p", glContext->eglSurface[index]);
         }
         glContext->eglSurface[index] = nullptr;
@@ -92,14 +92,14 @@ EGLBoolean egl_createSurface(JNIEnv *env, GLContext *glContext, jobject surface,
     ANativeWindow_release(nativeWindow);
     if (glContext->eglSurface[index] == EGL_NO_SURFACE) {
         LOGE("egl_createSurface failed.");
-        return EGL_FALSE;
+        return false;
     }
 
     LOGI("egl_createSurface success: %p", glContext->eglSurface[index]);
-    return EGL_TRUE;
+    return true;
 }
 
-EGLBoolean egl_makeCurrent(GLContext *glContext, EGLSurface eglSurface) {
+bool egl_makeCurrent(GLContext *glContext, EGLSurface eglSurface) {
     EGLBoolean ret = eglMakeCurrent(
             glContext->eglDisplay,
             eglSurface,
@@ -109,10 +109,10 @@ EGLBoolean egl_makeCurrent(GLContext *glContext, EGLSurface eglSurface) {
 
     if (ret != EGL_TRUE) {
         LOGE("egl_makeCurrent failed.");
-        return EGL_FALSE;
+        return false;
     }
 
-    return EGL_TRUE;
+    return true;
 }
 
 
