@@ -52,6 +52,13 @@ int GLContext::createProgram(JNIEnv *env, jobject thiz, jstring v_name, jstring 
 }
 
 
+// 设置渲染窗口尺寸
+void GLContext::setWindowSize(jint window_w, jint window_h) {
+    windowW = window_w;
+    windowH = window_h;
+}
+
+
 // 加载顶点坐标和纹理坐标
 void GLContext::loadVertices() {
     float vertices[] = {
@@ -78,6 +85,24 @@ void GLContext::loadVertices() {
     this->vbo[0] = vbo;
     this->ebo[0] = ebo;
     LOGI("GLContext::loadVertices success.");
+}
+
+
+// 加载顶点坐标和纹理坐标
+// vertices - 顶点属性数组
+// vNum - 顶点个数
+// lineLen - 每行的长度
+// indices - 索引数组
+// iNum - 索引个数
+void GLContext::loadVertices2(float vertices[], int vNum, int lineLen, GLuint indices[], int iNum) {
+    gl_genBuffer(&vbo[0], vertices, vNum * lineLen * sizeof(float));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, lineLen * sizeof(float), (void *) 0);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, lineLen - 3, GL_FLOAT, GL_FALSE, lineLen * sizeof(float), (void *) (3 * 4));
+    glEnableVertexAttribArray(1);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    gl_genIndexBuffer(&ebo[0], indices, sizeof(GLuint) * iNum);
+    LOGI("GLContext::loadVertices2 success.");
 }
 
 
@@ -159,7 +184,8 @@ void GLContext::configMatrix(
     // 顶点坐标变换矩阵变量名
     GLint m_location = glGetUniformLocation(program[program_index], "v_matrix");
     // 比例合适才旋转
-    bool really_rotate = ((frame_w > frame_h && window_w < window_h) || (frame_w < frame_h && window_w > window_h)) && rotate;
+    bool really_rotate =
+            ((frame_w > frame_h && window_w < window_h) || (frame_w < frame_h && window_w > window_h)) && rotate;
     if (really_rotate) {
         // 顺时针旋转90度矩阵，列主序
         float m_rotate90[16] = {
@@ -191,7 +217,7 @@ void GLContext::configMatrix(
         ratio_x = (float) window_w / frame_h;
         ratio_y = (float) window_h / frame_w;
     }
-    
+
     // 先搞清楚一种情况，其它很类似
     if (ratio_x < ratio_y && scale_type == 1 || ratio_y < ratio_x && scale_type == 2) {
         float scale_x = ratio_x / ratio_y; // 缩放系数

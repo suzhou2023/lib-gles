@@ -58,7 +58,6 @@ void gl_texImage2D(JNIEnv *env, jobject bitmap, uint32_t *width, uint32_t *heigh
 
     void *bitmapPixels;
     AndroidBitmap_lockPixels(env, bitmap, &bitmapPixels);
-    // todo: 加载图片到纹理（通过这个函数把图片数据加载到显卡了？）
     glTexImage2D(
             GL_TEXTURE_2D,
             0,
@@ -76,7 +75,7 @@ void gl_texImage2D(JNIEnv *env, jobject bitmap, uint32_t *width, uint32_t *heigh
 // 绘制
 void gl_drawElements(GLuint vertexNum) {
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glDrawElements(GL_TRIANGLES, vertexNum, GL_UNSIGNED_INT, (void *) 0);
 }
 

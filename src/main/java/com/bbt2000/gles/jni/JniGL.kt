@@ -18,6 +18,9 @@ object JniGL {
     // 创建EGLSurface
     external fun createEGLSurface(glContext: Long, surface: Any, index: Int = 0): Boolean
 
+    // 设置窗口尺寸
+    external fun setWindowSize(glContext: Long, width: Int, height: Int)
+
     // 加载顶点坐标和纹理坐标
     external fun loadVertices(glContext: Long)
 
@@ -29,9 +32,6 @@ object JniGL {
 
     // 创建FBO
     external fun createFbo(glContext: Long, width: Int, height: Int, index: Int)
-
-    // 设置窗口尺寸
-    external fun setWindowSize(glContext: Long, width: Int, height: Int)
 
     // deprecated
     // 设置变换矩阵

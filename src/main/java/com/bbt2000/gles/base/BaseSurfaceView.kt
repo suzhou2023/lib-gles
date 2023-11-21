@@ -35,12 +35,13 @@ open class BaseSurfaceView @JvmOverloads constructor(
             glContext = JniGL.createGLContext(assetManager = context.assets)
             if (glContext <= 0) return@post
             JniGL.createEGLSurface(glContext, holder.surface, 0)
-            JniGL.loadVertices(glContext)
         }
     }
 
     override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
-
+        glHandler.post {
+            JniGL.setWindowSize(glContext, width, height)
+        }
     }
 
     override fun surfaceDestroyed(holder: SurfaceHolder) {

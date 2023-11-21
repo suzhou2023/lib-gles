@@ -32,10 +32,20 @@ Java_com_bbt2000_gles_jni_JniGL_createGLContext(JNIEnv *env, jobject thiz, jobje
 
 extern "C"
 JNIEXPORT jboolean JNICALL
-Java_com_bbt2000_gles_jni_JniGL_createEGLSurface(JNIEnv *env, jobject thiz, jlong gl_context, jobject surface, jint index) {
+Java_com_bbt2000_gles_jni_JniGL_createEGLSurface(JNIEnv *env, jobject thiz, jlong gl_context, jobject surface,
+                                                 jint index) {
     if (gl_context <= 0) return false;
     auto *glContext = reinterpret_cast<GLContext *>(gl_context);
     return glContext->createEGLSurface(env, surface, index);
+}
+
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_bbt2000_gles_jni_JniGL_setWindowSize(JNIEnv *env, jobject thiz, jlong gl_context, jint width, jint height) {
+    if (gl_context <= 0) return;
+    auto *glContext = reinterpret_cast<GLContext *>(gl_context);
+    return glContext->setWindowSize(width, height);
 }
 
 
@@ -76,13 +86,6 @@ Java_com_bbt2000_gles_jni_JniGL_createFbo(
     if (gl_context <= 0) return;
     auto *glContext = reinterpret_cast<GLContext *>(gl_context);
     return glContext->createFbo(width, height, index);
-}
-
-
-extern "C"
-JNIEXPORT void JNICALL
-Java_com_bbt2000_gles_jni_JniGL_setWindowSize(JNIEnv *env, jobject thiz, jlong gl_context, jint width, jint height) {
-
 }
 
 
