@@ -118,7 +118,7 @@ int GLContext::createOesTexture() {
     // 不赋值的话，后面绘制的时候openGL会默认帮你激活图层0，我们再激活其它图层也是多余的。
     // 但是你一旦赋值，后面要激活的图层必须是这个值。
     // 配合FBO使用的时候，貌似只能设置为图层0。(目前测试结果，有待确认)
-    glUniform1i(glGetUniformLocation(program[0], "oes_texture"), 0);
+    glUniform1i(glGetUniformLocation(program[0], "oes_tex"), 0);
 
     oesTexture = texture;
     LOGI("GLContext::createOesTexture success.");
