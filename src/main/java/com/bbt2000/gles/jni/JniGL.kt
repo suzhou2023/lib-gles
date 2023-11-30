@@ -9,7 +9,7 @@ import android.content.res.AssetManager
  */
 object JniGL {
     init {
-        System.loadLibrary("gl-bbt")
+        System.loadLibrary("gl-common")
     }
 
     // 创建GLContext
