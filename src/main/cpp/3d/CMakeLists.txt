@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.22.1)
 
-set(PROJECT_NAME gl-common)
+set(PROJECT_NAME gl-3d)
 
 project(${PROJECT_NAME} VERSION 1.0)
 
@@ -10,23 +10,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 
 # 头文件
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/common")
+include_directories("./include")
 
 
-# opengl相关api编译成so
 add_library(
         ${PROJECT_NAME}
 
         SHARED
 
-        jni/jni.cpp
-        common/GLContext.cpp
-        common/asset_util.cpp
-        common/egl_util.cpp
-        common/fbo_util.cpp
-        common/gl_util.cpp
-        common/shader_util.cpp
+        loadObj.cpp
 )
 
 # 链接库
@@ -44,7 +36,6 @@ target_link_libraries(
 )
 
 
-add_subdirectory(3d)
 
 
 
