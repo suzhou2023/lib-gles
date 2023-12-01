@@ -42,15 +42,6 @@ Java_com_bbt2000_gles_jni_JniGL_createEGLSurface(JNIEnv *env, jobject thiz, jlon
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_bbt2000_gles_jni_JniGL_setWindowSize(JNIEnv *env, jobject thiz, jlong gl_context, jint width, jint height) {
-    if (gl_context <= 0) return;
-    auto *glContext = reinterpret_cast<GLContext *>(gl_context);
-    return glContext->setWindowSize(width, height);
-}
-
-
-extern "C"
-JNIEXPORT void JNICALL
 Java_com_bbt2000_gles_jni_JniGL_loadVertices(
         JNIEnv *env, jobject thiz, jlong gl_context) {
     if (gl_context <= 0) return;
@@ -91,11 +82,10 @@ Java_com_bbt2000_gles_jni_JniGL_createFbo(
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_bbt2000_gles_jni_JniGL_setMatrix(
-        JNIEnv *env, jobject thiz, jlong gl_context, jfloatArray matrix) {
+Java_com_bbt2000_gles_jni_JniGL_setWindowSize(JNIEnv *env, jobject thiz, jlong gl_context, jint width, jint height) {
     if (gl_context <= 0) return;
     auto *glContext = reinterpret_cast<GLContext *>(gl_context);
-    return glContext->setMatrix(env, gl_context, matrix);
+    return glContext->setWindowSize(width, height);
 }
 
 
@@ -116,28 +106,6 @@ Java_com_bbt2000_gles_jni_JniGL_configMatrix(
     if (gl_context <= 0) return;
     auto *glContext = reinterpret_cast<GLContext *>(gl_context);
     glContext->configMatrix(program_index, frame_w, frame_h, window_w, window_h, scale_type, rotate);
-}
-
-
-extern "C"
-JNIEXPORT void JNICALL
-Java_com_bbt2000_gles_jni_JniGL_drawFrame(
-        JNIEnv *env, jobject thiz, jlong gl_context) {
-    if (gl_context <= 0) return;
-    auto *glContext = reinterpret_cast<GLContext *>(gl_context);
-    // 不需要fbo，直接从oes纹理画到预览surface和codec input surface
-    glUseProgram(glContext->program[0]);
-    glActiveTexture(GL_TEXTURE0);
-    if (glContext->eglSurface[0] != nullptr) {
-        egl_makeCurrent(glContext, glContext->eglSurface[0]);
-        gl_drawElements(6);
-        eglSwapBuffers(glContext->eglDisplay, glContext->eglSurface[0]);
-    }
-    if (glContext->eglSurface[1] != nullptr) {
-        egl_makeCurrent(glContext, glContext->eglSurface[1]);
-        gl_drawElements(6);
-        eglSwapBuffers(glContext->eglDisplay, glContext->eglSurface[1]);
-    }
 }
 
 

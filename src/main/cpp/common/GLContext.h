@@ -23,9 +23,6 @@ public:
     // 创建着色器程序
     int createProgram(JNIEnv *env, jobject thiz, jstring v_name, jstring f_name, jint index);
 
-    // 设置渲染窗口尺寸
-    void setWindowSize(jint window_w, jint window_h);
-
     // 加载顶点坐标和纹理坐标
     void loadVertices();
 
@@ -38,8 +35,8 @@ public:
     // 创建fbo
     void createFbo(int width, int height, int index);
 
-    // 设置矩阵
-    void setMatrix(JNIEnv *env, jlong gl_context, jfloatArray matrix);
+    // 设置渲染窗口尺寸
+    void setWindowSize(jint window_w, jint window_h);
 
     // 矩阵配置：根据图形和窗口的尺寸配置合适的矩阵(顶点坐标变换矩阵、纹理坐标变换矩阵)
     void

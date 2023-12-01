@@ -18,14 +18,11 @@ object JniGL {
     // 创建EGLSurface
     external fun createEGLSurface(glContext: Long, surface: Any, index: Int = 0): Boolean
 
-    // 设置窗口尺寸
-    external fun setWindowSize(glContext: Long, width: Int, height: Int)
-
     // 加载顶点坐标和纹理坐标
     external fun loadVertices(glContext: Long)
 
     // 创建着色器程序
-    external fun createProgram(glContext: Long, vName: String, fName: String, index: Int = 0)
+    external fun createProgram(glContext: Long, vName: String, fName: String, index: Int = 0): Int
 
     // 创建OES纹理
     external fun createOESTexture(glContext: Long): Int
@@ -33,9 +30,8 @@ object JniGL {
     // 创建FBO
     external fun createFbo(glContext: Long, width: Int, height: Int, index: Int)
 
-    // deprecated
-    // 设置变换矩阵
-    external fun setMatrix(glContext: Long, matrix: FloatArray)
+    // 设置窗口尺寸
+    external fun setWindowSize(glContext: Long, width: Int, height: Int)
 
     // 矩阵配置：根据图形和窗口的尺寸配置合适的矩阵
     external fun configMatrix(
@@ -48,9 +44,6 @@ object JniGL {
         scaleType: Int = 1, // 缩放类型：1 - crop，2 - fit
         rotate: Boolean = true, // 是否旋转
     )
-
-    // 绘制
-    external fun drawFrame(glContext: Long)
 
     // 销毁GLContext
     external fun destroyGLContext(glContext: Long)

@@ -52,13 +52,6 @@ int GLContext::createProgram(JNIEnv *env, jobject thiz, jstring v_name, jstring 
 }
 
 
-// 设置渲染窗口尺寸
-void GLContext::setWindowSize(jint window_w, jint window_h) {
-    windowW = window_w;
-    windowH = window_h;
-}
-
-
 // 加载顶点坐标和纹理坐标
 void GLContext::loadVertices() {
     float vertices[] = {
@@ -152,22 +145,10 @@ void GLContext::createFbo(int width, int height, int index) {
 }
 
 
-// 设置矩阵
-void GLContext::setMatrix(JNIEnv *env, jlong gl_context, jfloatArray matrix) {
-    if (gl_context <= 0) return;
-    auto *glContext = reinterpret_cast<GLContext *>(gl_context);
-
-    auto *p = (jfloat *) env->GetFloatArrayElements(matrix, nullptr);
-    float array[] = {
-            p[0], p[1], p[2], p[3],
-            p[4], p[5], p[6], p[7],
-            p[8], p[9], p[10], p[11],
-            p[12], p[13], p[14], p[15]
-    };
-    glUseProgram(glContext->program[0]);
-    GLint matrixLocation = glGetUniformLocation(glContext->program[0], "v_matrix");
-    glUniformMatrix4fv(matrixLocation, 1, GL_FALSE, array);
-    LOGI("GLContext::setMatrix success.");
+// 设置渲染窗口尺寸
+void GLContext::setWindowSize(jint window_w, jint window_h) {
+    windowW = window_w;
+    windowH = window_h;
 }
 
 
@@ -181,11 +162,18 @@ void GLContext::configMatrix(
         int scale_type, // 缩放类型：1 - crop, 2 - fit
         bool rotate // 是否旋转
 ) {
+    LOGI("GLContext::configMatrix frame_w = %d", frame_w);
+    LOGI("GLContext::configMatrix frame_h = %d", frame_h);
+    LOGI("GLContext::configMatrix window_w = %d", window_w);
+    LOGI("GLContext::configMatrix window_h = %d", window_h);
+
+    // 激活程序
+    glUseProgram(program[program_index]);
     // 顶点坐标变换矩阵变量名
     GLint m_location = glGetUniformLocation(program[program_index], "v_matrix");
+
     // 比例合适才旋转
-    bool really_rotate =
-            ((frame_w > frame_h && window_w < window_h) || (frame_w < frame_h && window_w > window_h)) && rotate;
+    bool really_rotate = ((frame_w > frame_h && window_w < window_h) || (frame_w < frame_h && window_w > window_h)) && rotate;
     if (really_rotate) {
         // 顺时针旋转90度矩阵，列主序
         float m_rotate90[16] = {
@@ -221,6 +209,7 @@ void GLContext::configMatrix(
     // 先搞清楚一种情况，其它很类似
     if (ratio_x < ratio_y && scale_type == 1 || ratio_y < ratio_x && scale_type == 2) {
         float scale_x = ratio_x / ratio_y; // 缩放系数
+        LOGI("GLContext::configMatrix scale_x = %f", scale_x);
         // 缩放+平移得到矩阵(列主序)
         float m_tex[9] = {
                 scale_x, 0.0, 0.0,
@@ -229,8 +218,10 @@ void GLContext::configMatrix(
         };
         glUniformMatrix3fv(tex_location, 1, false, m_tex);
     }
+
     if (ratio_y < ratio_x && scale_type == 1 || ratio_x < ratio_y && scale_type == 2) {
         float scale_y = ratio_y / ratio_x; // 缩放系数
+        LOGI("GLContext::configMatrix scale_y = %f", scale_y);
         float m_tex[9] = {
                 1.0, 0.0, 0.0,
                 0.0, scale_y, 0.0,
