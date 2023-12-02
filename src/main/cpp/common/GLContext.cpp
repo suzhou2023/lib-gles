@@ -162,11 +162,6 @@ void GLContext::configMatrix(
         int scale_type, // 缩放类型：1 - crop, 2 - fit
         bool rotate // 是否旋转
 ) {
-    LOGI("GLContext::configMatrix frame_w = %d", frame_w);
-    LOGI("GLContext::configMatrix frame_h = %d", frame_h);
-    LOGI("GLContext::configMatrix window_w = %d", window_w);
-    LOGI("GLContext::configMatrix window_h = %d", window_h);
-
     // 激活程序
     glUseProgram(program[program_index]);
     // 顶点坐标变换矩阵变量名
@@ -202,6 +197,7 @@ void GLContext::configMatrix(
         ratio_x = window_w / (float) frame_w;
         ratio_y = window_h / (float) frame_h;
     } else {
+        // todo:结论正确，但没太想清楚
         ratio_x = window_h / (float) frame_w;
         ratio_y = window_w / (float) frame_h;
     }
