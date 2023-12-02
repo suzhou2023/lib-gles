@@ -199,11 +199,11 @@ void GLContext::configMatrix(
     // 根据是否旋转，ratio_x和ratio_y取值不一样
     float ratio_x, ratio_y;
     if (!really_rotate) {
-        ratio_x = (float) window_w / frame_w;
-        ratio_y = (float) window_h / frame_h;
+        ratio_x = window_w / (float) frame_w;
+        ratio_y = window_h / (float) frame_h;
     } else {
-        ratio_x = (float) window_w / frame_h;
-        ratio_y = (float) window_h / frame_w;
+        ratio_x = window_h / (float) frame_w;
+        ratio_y = window_w / (float) frame_h;
     }
 
     // 先搞清楚一种情况，其它很类似
