@@ -4,10 +4,11 @@
  *  description : 
  */
 
-
+#include <vector>
 #include "glm/vec2.hpp"
 #include "glm/vec3.hpp"
 
+using namespace std;
 using namespace glm;
 
 // 表示一个顶点属性
@@ -18,7 +19,12 @@ struct Vertex {
 };
 
 
+class Mesh {
+public:
 
+    vector<Vertex> verDate;
+
+};
 
 
 
