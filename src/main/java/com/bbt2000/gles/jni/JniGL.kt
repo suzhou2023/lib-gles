@@ -28,7 +28,7 @@ object JniGL {
     external fun createOESTexture(glContext: Long): Int
 
     // 创建FBO
-    external fun createFbo(glContext: Long, width: Int, height: Int, index: Int)
+    external fun createFbo(glContext: Long, textureW: Int, textureH: Int, index: Int)
 
     // 设置窗口尺寸
     external fun setWindowSize(glContext: Long, width: Int, height: Int)

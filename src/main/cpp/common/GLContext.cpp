@@ -120,10 +120,10 @@ int GLContext::createOesTexture() {
 
 
 // 创建fbo
-void GLContext::createFbo(int width, int height, int index) {
+void GLContext::createFbo(int texture_w, int texture_h, int index) {
     GLuint fbo, texture;
     gl_genTex2D(&texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture_w, texture_h, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
     glGenFramebuffers(1, &fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
     glFramebufferTexture2D(

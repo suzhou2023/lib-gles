@@ -73,10 +73,10 @@ Java_com_bbt2000_gles_jni_JniGL_createOESTexture(
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_bbt2000_gles_jni_JniGL_createFbo(
-        JNIEnv *env, jobject thiz, jlong gl_context, jint width, jint height, jint index) {
+        JNIEnv *env, jobject thiz, jlong gl_context, jint texture_w, jint texture_h, jint index) {
     if (gl_context <= 0) return;
     auto *glContext = reinterpret_cast<GLContext *>(gl_context);
-    return glContext->createFbo(width, height, index);
+    return glContext->createFbo(texture_w, texture_h, index);
 }
 
 
