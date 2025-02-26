@@ -30,7 +30,7 @@ void gl_genIndexBuffer(GLuint *ebo, GLuint data[], GLuint size) {
 
 // 创建2d纹理对象，绑定和配置
 void gl_genTex2D(GLuint *tex_2d) {
-    // 创建纹理对象
+    // 创建纹理对象，（生成标识符，并没有显存分配）
     glGenTextures(1, tex_2d);
     // 绑定一个纹理对象
     glBindTexture(GL_TEXTURE_2D, *tex_2d);
@@ -58,6 +58,7 @@ void gl_texImage2D(JNIEnv *env, jobject bitmap, uint32_t *width, uint32_t *heigh
 
     void *bitmapPixels;
     AndroidBitmap_lockPixels(env, bitmap, &bitmapPixels);
+    // 真正分配了显存
     glTexImage2D(
             GL_TEXTURE_2D,
             0,
